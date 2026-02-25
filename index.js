@@ -58,7 +58,7 @@ async function kickFromChannel(userId) {
 async function createInviteLink() {
   const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/createChatInviteLink`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ chat_id: CHANNEL_ID, member_limit: 1, expire_date: Math.floor(Date.now()/1000) + 300 })
+    body: JSON.stringify({ chat_id: CHANNEL_ID, member_limit: 1, expire_date: Math.floor(Date.now()/1000) + 14400 })
   });
   const data = await response.json();
   return data.result ? data.result.invite_link : null;
