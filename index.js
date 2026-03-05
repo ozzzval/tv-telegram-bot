@@ -63,7 +63,6 @@ async function handleUpdate(update) {
       const days = parseInt(parts[2]) || 30;
       const sub = await Subscriber.findOne({ userId: targetId });
       if (!sub) return;
-
       const expiry = new Date();
       expiry.setDate(expiry.getDate() + days);
       sub.isActive = true;
@@ -72,7 +71,6 @@ async function handleUpdate(update) {
       sub.pendingPlan = null;
       sub.recordatorioEnviado = false;
       await sub.save();
-
       await sendMessage(sub.userId, `🎉 ¡Tu acceso ha sido activado! Expiración: ${expiry.toLocaleDateString('es-MX')}`);
       await sendMessage(chatId, `Usuario ${targetId} activado.`);
       return;
@@ -88,28 +86,18 @@ async function handleUpdate(update) {
   if (text === '/suscribir') {
     let sub = await Subscriber.findOne({ userId });
     if (sub && sub.isActive && sub.subscriptionExpiry > new Date()) {
-      await sendMessage(chatId, "Ya tienes una suscripción activa.");
+      await sendMessage(chatId, 'Ya tienes una suscripción activa.');
       return;
     }
-    await sendMessage(chatId, `<b>Planes disponibles:</b>
-
-0. <b>PRUEBA 1 mes</b> - 1 USDT
-1. <b>1 mes</b> - 5 USDT
-2. <b>3 meses</b> - 10 USDT
-
-Usa:
-/plan0 para prueba
+    await sendMessage(chatId, `<b>Planes disponibles:</b>\n0. <b>PRUEBA 1 mes</b> - 1 USDT\n1. <b>1 mes</b> - 5 USDT\n2. <b>3 meses</b> - 10 USDT\nUsa:\n/plan0 para prueba\n/plan1 para 1 mes\n/plan3 para 3 meses`);
+    return;
+  }
 
   if (text === '/plan0' || text === '/plan1' || text === '/plan3') {
     const key = text.replace('/plan', '');
     const plan = PLANES[key];
     await Subscriber.findOneAndUpdate({ userId }, { pendingPlan: key }, { upsert: true });
-    await sendMessage(chatId, `<b>Has elegido: ${plan.label}</b>
-
-Envía ${plan.precio} USDT (TRC20) a:
-<code>${WALLET_USDT}</code>
-
-Envía /pago [hash] al terminar.`);
+    await sendMessage(chatId, `<b>Has elegido: ${plan.label}</b>\nEnvía ${plan.precio} USDT (TRC20) a:\n<code>${WALLET_USDT}</code>\nEnvía /pago [hash] al terminar.`);
     return;
   }
 }
